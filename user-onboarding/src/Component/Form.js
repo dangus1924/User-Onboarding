@@ -13,7 +13,7 @@ const UserForm = ({errors, status, touched}) => {
     },[status])
     return(
        
-        <Form className="form">
+        <Form>
             <h1>Welcome</h1>
             {touched.name && errors.name && <p className="error">{errors.name}</p>}
             <Field type="text" name="name" placeholder="name"/>
@@ -24,6 +24,13 @@ const UserForm = ({errors, status, touched}) => {
             {touched.password && errors.password && <p className="error">{errors.password}</p>}
             <Field type="password" name="password" placeholder="password"/>
             
+            <Field name="role" component="select">
+            <option value="" disabled>Select Role:</option>
+            <option value="Manager">Manager</option>
+            <option value="Team Lead">Team Lead</option>
+            <option value="Student">Student</option>            
+            </Field>
+
             {touched.agreement && errors.agreement && <p className="error">{errors.agreement}</p>}
             <label>
                 <Field type="checkbox" name="agreement"/>
@@ -35,9 +42,12 @@ const UserForm = ({errors, status, touched}) => {
                 <span>Terms of Service</span>
             </label>
             <button type="submit">Submit</button>
-            {users.map(user => (
+            {/* {users.map((user) => (
                 <div>name:{user.name}</div>
-            ))}
+            ))}, */}
+            {users.map((user) => {
+                return <div>Welcome: {user.name}</div>
+            })}
         </Form>
     )
 }
@@ -53,21 +63,21 @@ export default withFormik({
     }
 },
 validationSchema: yup.object().shape({
-    name: yup.string().required(),
-    email: yup.string().email().required(),
-    password: yup.string().required(),
-    agreement: yup.boolean().oneOf([true]),
+    name: yup.string().required('name is required'),
+    email: yup.string().email().required('Email is required'),
+    password: yup.string().required('Password is required'),
+    agreement: yup.boolean().oneOf([true], 'You must agree with our terms and service'),
 }),
 handleSubmit: (values, {setStatus}) => {
     axios.post('https://reqres.in/api/users',values)
     .then((res) => {
-        console.log(res)
+        
         setStatus(res.data)
     })
     .catch((err) => {
-        console.log(err)
+        console.log('Error:', err)
     })
-    console.log(values)
+   
 },
 
 })(UserForm)
